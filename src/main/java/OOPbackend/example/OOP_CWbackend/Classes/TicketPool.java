@@ -1,28 +1,34 @@
 package OOPbackend.example.OOP_CWbackend.Classes;
 
+import OOPbackend.example.OOP_CWbackend.ApiController.MessageService;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+
+@Slf4j
 public class TicketPool {
     private Queue<Ticket> tickets;
     private int maxTickets;
-    private Configuration configuration;
-    private Lock lock = new ReentrantLock();
-    private Condition notEmpty = lock.newCondition();
-    private Condition notFull = lock.newCondition();
+    private final Configuration configuration;
+    private final Lock lock = new ReentrantLock();
+    private final Condition notEmpty = lock.newCondition();
+    private final Condition notFull = lock.newCondition();
+    private MessageService messageService;
 
-    public TicketPool(Configuration configuration,Queue<Ticket> tickets) {
+    public TicketPool(Configuration configuration) {
+        this.tickets = new LinkedList<>();
         this.configuration = configuration;
-        this.tickets = new LinkedList<>(tickets);
     }
 
     public void addTickets(Ticket ticket) {
         lock.lock();
         try{
-            while(tickets.size()>= configuration.getMaxTickets()){
+            while(tickets.size() >= configuration.getMaxTickets()){
                 try {
                     notFull.await();
                 } catch (InterruptedException e) {
@@ -32,9 +38,17 @@ public class TicketPool {
             }
             tickets.add(ticket);
             System.out.println(Thread.currentThread().getName()+" Ticket added to the pool. Ticket pool size is: "+tickets.size());
+//            messageService.SendMessage(
+//                    configuration.getID(),
+//                    configuration.getTotalTickets(),
+//                    configuration.getMaxTickets(),
+//                    configuration.getReleaseRate(),
+//                    configuration.getCustomerRate()
+//            );
             notEmpty.signal();
 
-        }finally {
+        }
+        finally {
             lock.unlock();
         }
 
@@ -52,7 +66,7 @@ public class TicketPool {
                     return;
                 }
             } Ticket ticket = tickets.poll();
-            System.out.println(Thread.currentThread().getName()+" {"+ticket+"} bought. Ticket pool size: "+tickets.size()); // should be a massage when implement websockets
+            System.out.println(Thread.currentThread().getName()+" {"+ticket+"} bought. Ticket pool size: "+tickets.size());
             notEmpty.signal();
         }finally {
             lock.unlock();

@@ -17,32 +17,31 @@ public class Vendor implements Runnable{
     private Logger logger = Logger.getLogger(this.getClass().getName());
     private TicketPool ticketPool;
     private Ticket ticket;
-    private String eventName;
-    private double ticketPrice;
+    private String eventName = "Musical";
+    private double ticketPrice = 50;
     private TicketController ticketController;
 
     public Vendor (){}
 
-    public Vendor(TicketPool ticketPool) {
-        this.ticketPool = ticketPool;
-    }
 
-    public Vendor(int totalTickets, int releaseRate) {
+
+    public Vendor(TicketPool ticketPool,int totalTickets, int releaseRate) {
         this.totalTickets = totalTickets;
         this.releaseRate = releaseRate;
+        this.ticketPool = ticketPool;
     }
 
     @Override
     public void run() {
-        for (int i = 0; i < totalTickets; i++) {
-            System.out.println(Thread.currentThread().getName() + ": Thread started");
-            logger.info(Thread.currentThread().getName() + ": Thread started");
-//            String ticketId = String.valueOf(i);
-//            ticket = new Ticket(ticketId,eventName,ticketPrice);
-//            ticketPool.addTickets(ticket);
-//            ticketController.createTicket(ticket);
+        while (!Thread.currentThread().isInterrupted()){
+            for (int i = 0; i < totalTickets; i++) {
+                String ticketId = String.valueOf(i);
+                ticket = new Ticket(ticketId,eventName,ticketPrice);
+                ticketPool.addTickets(ticket);
 
 
+
+            }
 
             try{
                 Thread.sleep(releaseRate*1000);
