@@ -26,19 +26,21 @@ public class Configuration {
     private int maxTickets;
     private int releaseRate;
     private int customerRate;
+    private int noOfVendor;
+    private int noOfConsumer;
 
     public Configuration() {}
 
 
 
-    public Configuration(int totalTickets, int maxTickets, int releaseRate, int customerRate) {
+    public Configuration(int totalTickets, int maxTickets, int releaseRate, int customerRate,int noOfVendor,int noOfConsumer) {
         this.totalTickets = totalTickets;
         this.maxTickets = maxTickets;
         this.releaseRate = releaseRate;
         this.customerRate = customerRate;
+        this.noOfVendor = noOfVendor;
+        this.noOfConsumer = noOfConsumer;
     }
-
-
 
 
 }

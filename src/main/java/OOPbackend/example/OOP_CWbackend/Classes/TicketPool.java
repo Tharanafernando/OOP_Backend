@@ -1,11 +1,7 @@
 package OOPbackend.example.OOP_CWbackend.Classes;
 
-import OOPbackend.example.OOP_CWbackend.ApiController.MessageService;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
@@ -23,13 +19,17 @@ public class TicketPool {
 
     @Setter
     private int maxTickets;
-    private Configuration configuration;
+    @Setter
+    private int totalTickets;
     private final Lock lock = new ReentrantLock();
     private final Condition notEmpty = lock.newCondition();
     private final Condition notFull = lock.newCondition();
+    private int limit = 0;
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
+
 
 
     public void addTickets(Ticket ticket) {
@@ -42,10 +42,15 @@ public class TicketPool {
                     Thread.currentThread().interrupt();
                     return;
                 }
+                limit++;
+                if (limit == totalTickets){
+                    sendMessage("Total number of tickets reached");
+                    return;
+                }
             }
             tickets.add(ticket);
             System.out.println(Thread.currentThread().getName()+" Ticket added to the pool. Ticket pool size is: "+tickets.size());
-            sendMessage(Thread.currentThread().getName()+" Ticket added to the pool. Ticket pool size is: "+tickets.size());
+            sendMessage(Thread.currentThread().getName()+" Ticket added to the pool. Ticket pool size is: "+tickets.size()+"\n");
 
             notEmpty.signal();
 
@@ -70,12 +75,22 @@ public class TicketPool {
                     return;
                 }
             } Ticket ticket = tickets.poll();
-            System.out.println(Thread.currentThread().getName()+" {"+ticket+"} bought. Ticket pool size: "+tickets.size());
-            sendMessage(Thread.currentThread().getName()+" {"+ticket+"} bought. Ticket pool size: "+tickets.size());
+            System.out.println(Thread.currentThread().getName()+"bought ticket. Ticket pool size: "+tickets.size());
+            sendMessage(Thread.currentThread().getName()+"bought ticket. Ticket pool size: "+tickets.size()+"\n");
 
 
             notFull.signal();
         }finally {
+            lock.unlock();
+        }
+
+    }
+
+    public int currentSize() {
+        lock.lock();
+        try {
+            return tickets.size();
+        }finally{
             lock.unlock();
         }
 
