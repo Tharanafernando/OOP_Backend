@@ -5,10 +5,8 @@ import OOPbackend.example.OOP_CWbackend.Classes.Ticket;
 import OOPbackend.example.OOP_CWbackend.Repository.TicketRepo;
 import lombok.Getter;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.yaml.snakeyaml.events.Event;
 
 import java.util.List;
 
@@ -32,4 +30,14 @@ public class TicketController {
 
         return ResponseEntity.status(200).body(ticketRepo.save(ticket));
     }
+
+    @DeleteMapping("/deleteTicket/{id}")
+    public ResponseEntity<String> deleteTicket(@PathVariable String id) {
+       return ticketRepo.findById(id).map(ticket -> {
+            ticketRepo.delete(ticket);
+            return ResponseEntity.ok("Ticket deleted successfully");
+        }).orElse(ResponseEntity.status(404).body("Ticket not found"));
+
+    }
+
 }

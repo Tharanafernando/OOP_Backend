@@ -3,6 +3,7 @@ package OOPbackend.example.OOP_CWbackend.ApiController;
 
 import OOPbackend.example.OOP_CWbackend.Classes.Configuration;
 import OOPbackend.example.OOP_CWbackend.Repository.ConfigRepo;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,11 +27,19 @@ public class ConfigRestApi {
 
     }
 
+
+
+//    @PostMapping("/createConfig")
+//    public ResponseEntity<Configuration> createConfig(@RequestBody Configuration config) {
+//        return ResponseEntity.status(201).body(this.configRepo.save(config));
+//
+//
+//    }
+
     @PostMapping("/createConfig")
-    public ResponseEntity<Configuration> createConfig(@RequestBody Configuration config) {
-
-
-        return ResponseEntity.status(201).body(this.configRepo.save(config));
+    public ResponseEntity<Main> createConfig(@RequestBody Main main) {
+        Main config = main;
+        return new ResponseEntity<>(config, HttpStatus.CREATED);
 
 
     }
